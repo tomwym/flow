@@ -1,4 +1,4 @@
-#include <e57handle.hpp>
+#include "e57handle.hpp"
 
 /**
  * This class interfaces with the E57 library to extract point cloud data
@@ -100,7 +100,7 @@ void E57Handle::SetData() {
     std::cout << "SetData" << '\n';
     // preallocate data
     m_data = std::vector<std::vector<float>>(m_N, std::vector<float>(m_M, 0));
-
+    m_data_linear.reserve(m_N*m_M);
     for (int i = 0; i < m_N; i++) {
         // get reference for node in prototype
         e57::Node n = m_prototype->get(i);
@@ -132,6 +132,7 @@ void E57Handle::SetData() {
             // this doesn't work for some reason... :p
             //tracking[i].assign(std::begin(rawValue), std::end(rawValue));
             m_data[i].assign(rawValue.begin(), rawValue.end());
+            m_data_linear.insert(m_data_linear.end(), rawValue.begin(), rawValue.end());
             reader.close();
 
         } catch(e57::E57Exception& ex) {
@@ -177,6 +178,17 @@ std::vector<std::vector<float>>&& E57Handle::MoveData() {
     return std::move(m_data);
 }
 
+std::vector<float>&& E57Handle::MoveLinearData() {
+    return std::move(m_data_linear);
+}
+
+const std::vector<float>& E57Handle::HandleLinearData() const {
+    return m_data_linear;
+}
+
+std::pair<int64_t, int64_t> E57Handle::GetDataDims() const {
+    return std::make_pair(m_M, m_N);
+}
 
 void E57Handle::PrintData() {
     for (unsigned j = 0; j < m_M; j++) {
