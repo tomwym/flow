@@ -49,10 +49,11 @@ void Geometry::CollectNormalizedData() {
     m_normalizedData = (scale*m_normalizedData.array()).matrix();
 }
 
-Eigen::Matrix3f Geometry::CollectRotationMatrix() {
-    const float x = m_rotation_vals[0];
-    const float y = m_rotation_vals[1];
-    const float z = m_rotation_vals[2];
+template<typename T>
+Eigen::Matrix3f Geometry::CollectRotationMatrix(const T& rotations) {
+    const float x = rotations[0];
+    const float y = rotations[1];
+    const float z = rotations[2];
 
     const float cz = std::cos(z);
     const float sz = std::sin(z);
@@ -69,8 +70,8 @@ Eigen::Matrix3f Geometry::CollectRotationMatrix() {
     const float cx = std::cos(x);
     const float sx = std::sin(x);
     Eigen::Matrix3f rotX = Eigen::Matrix3f::Identity();
-    rotX(1,1) = cx; rotZ(1,2) = -sx;
-    rotX(2,1) = sx; rotZ(2,2) = cx;
+    rotZ(1,1) = cx; rotZ(1,2) = -sx;
+    rotZ(2,1) = sx; rotZ(2,2) = cx;
 
     return rotZ * rotY * rotX;
 }
@@ -85,9 +86,10 @@ void Geometry::CollectTransformedData() {
 
 void Geometry::CollectPlanarData() {
     m_planarData = Eigen::MatrixXf(m_normalizedData.rows(), 3);
-    Eigen::Matrix3f rotation = CollectRotationMatrix();
+    Eigen::Matrix3f rotation = CollectRotationMatrix<Eigen::Vector3f>(m_rotation_vals);
+    Eigen::MatrixXf out = m_normalizedData * rotation.transpose();
     // sets the normal to project to according to current rotation
-    Eigen::Matrix3f basis = rotation * Eigen::Matrix3f::Identity();
+    Eigen::Matrix3f basis = Eigen::Matrix3f::Identity();
     Eigen::Vector3f e_x = basis.col(0);
     Eigen::Vector3f e_y = basis.col(1);
     Eigen::Vector3f e_z = basis.col(2);
@@ -97,9 +99,11 @@ void Geometry::CollectPlanarData() {
 
     // m_planarData;
     int i = 0;
-    for (const auto& row : m_normalizedData.rowwise()) {
+    for (const auto& row : out.rowwise()) {
+        // [0, 0, 1]
         const float mag = row.dot(m_view_normal);
-        const Eigen::Vector3f pprime = row - mag * row;
+        // pprime is the point which now exists on the plane
+        const Eigen::Vector3f pprime = row.transpose() - mag*m_view_normal;
         const float projxprime = pprime.dot(e_x);
         const float projyprime = pprime.dot(e_y);
         m_planarData(i,0) = projxprime;

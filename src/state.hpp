@@ -10,6 +10,7 @@
 #include "window.hpp"
 #include "geometry.hpp"
 #include "mesh.hpp"
+#include "transform.hpp"
 
 class State {
 public:
@@ -27,10 +28,12 @@ public:
 
     static void setGeom(Geometry* const _geom);
     static void setMesh(Mesh* const _mesh);
+    static void setTransform(Transform* const _transform);
     static void setMasterkey(std::map<char, State* const> mep);
 protected:
     static Geometry* geom;
     static Mesh* mesh;
+    static Transform* transform;
 private:
     static std::set<char> seen;
     static std::map<char, State* const> masterkey;
@@ -50,6 +53,8 @@ public:
     // State* Spin(Window& wind);
     void Orient();
     void Resize();
+    void Show3D();
+    void Show2D();
     void IncrementAxis();
     void DecrementAxis();
     void IncrementRotation();

@@ -96,6 +96,7 @@ int main() {
     // static interface initializations
     State::setGeom(&geom);
     State::setMesh(&mesh);
+    State::setTransform(&transform);
     State::setMasterkey({{'0', &st0},
                          {'1', &st1},
                          {'2', &st2},
@@ -107,7 +108,7 @@ int main() {
         // transform.GetRot().z = counter;
         shader.Bind();
         fdsa = makeTriangle<void>(Display::m_width, Display::m_height, theta, 800);
-        transform.UpdateRotation<Eigen::Vector3f>(geom.m_rotation_vals);
+        // transform.UpdateRotation<Eigen::Vector3f>(geom.m_rotation_vals);
         shader.Update(transform, camera);
         mesh.Draw(fdsa, 2, 12);
         wind.Update();

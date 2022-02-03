@@ -7,6 +7,7 @@ std::set<char> State::seen = {'0'};
 std::map<char, State* const> State::masterkey = {};
 Geometry* State::geom = nullptr;
 Mesh* State::mesh = nullptr;
+Transform* State::transform = nullptr;
 
 void State::setGeom(Geometry* const _geom) {
     geom = _geom;
@@ -14,6 +15,10 @@ void State::setGeom(Geometry* const _geom) {
 
 void State::setMesh(Mesh* const _mesh) {
     mesh = _mesh;
+}
+
+void State::setTransform(Transform* const _transform) {
+    transform = _transform;
 }
 
 void State::setMasterkey(std::map<char, State* const> mep) {
@@ -75,10 +80,10 @@ void State0::StateSpecific(const SDL_Keycode k) {
     //std::cout << "in state 0 statespecific" << '\n';
     switch (k) {
     case SDLK_o:
-        this->Orient();
+        this->Show3D();
         break;
-    case SDLK_r:
-        this->Resize();
+    case SDLK_p:
+        this->Show2D();
         break;
     case SDLK_UP:
         this->IncrementAxis();
@@ -101,8 +106,16 @@ void State0::Orient() {
     std::cout << "state 0 orient" << '\n';
 }
 
-void State0::Resize() {
+// o
+void State0::Show3D() {
+    transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
+    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetNormalizedData()));
+}
+
+// p
+void State0::Show2D() {
     geom->CollectPlanarData();
+    transform->UpdateRotation<std::vector<float>>({0,0,0});
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
 }
 
@@ -124,8 +137,10 @@ void State0::DecrementAxis() {
 
 void State0::IncrementRotation() {
     geom->m_rotation_vals[geom->current_axis] += rotation_step;
+    transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
 }
 
 void State0::DecrementRotation() {
     geom->m_rotation_vals[geom->current_axis] -= rotation_step;
+    transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);    
 }

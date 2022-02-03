@@ -15,7 +15,8 @@ public:
     Geometry(const E57Handle* const _e57objp);
     /* [0] */   void CollectRawData();
     /* [1] */   void CollectNormalizedData();
-    /* [2] */   Eigen::Matrix3f CollectRotationMatrix();
+                template<typename T>
+    /* [2] */   Eigen::Matrix3f CollectRotationMatrix(const T& rotations);
     /* [3] */   void CollectTranslationVector();
     /* [4] */   void CollectTransformedData();
     /* [5] */   void CollectPlanarData();

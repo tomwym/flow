@@ -10,15 +10,15 @@ class Mesh : public Display {
 public:
     Mesh(const std::vector<glm::vec3>& vertices1, const std::vector<glm::vec3>& vertices2);
     void UpdateStatic(const std::vector<glm::vec3>& vertices);
-    void UpdateDynamic(const std::vector<>& vertices);
+    void UpdateDynamic(const std::vector<glm::vec3>& vertices);
 
     void Draw(const std::vector<glm::vec3>& vertices, 
               const int n_elements, const int element_size);
     virtual ~Mesh();
 protected:
 private:
-    Mesh(const Mesh& other) {}
-    void operator=(const Mesh& other) {}   
+    Mesh(const Mesh& other) = delete;
+    void operator=(const Mesh& other) = delete;  
 
     enum {
         POSITION_VB,
