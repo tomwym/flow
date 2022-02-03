@@ -12,8 +12,11 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "-Wall")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+# pch
+# target_precompile_headers(FLOW PUBLIC Dense)
 
 # custom names for dirs
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -25,13 +28,14 @@ set(PROJECT_DEPENDENCIES_DIR ${CMAKE_SOURCE_DIR}/dep)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BIN_DIR})
 
 set(SOURCES
-    ${PROJECT_SOURCE_DIR}/display.cpp
     ${PROJECT_SOURCE_DIR}/flow.cpp
-    ${PROJECT_SOURCE_DIR}/mesh.cpp
     ${PROJECT_SOURCE_DIR}/e57handle.cpp
+    ${PROJECT_SOURCE_DIR}/geometry.cpp
+    ${PROJECT_SOURCE_DIR}/state.cpp
 )
 
 add_executable(flow ${SOURCES})
+add_subdirectory(src/display)
 
 # find xerces library needed for .so 
 set(XERCES_DIR ${PROJECT_DEPENDENCIES_DIR}/xerces)
@@ -53,6 +57,7 @@ target_include_directories(flow PUBLIC ${PROJECT_INCLUDE_DIR})
 
 target_include_directories(
     flow
+    PUBLIC ${PROJECT_SRC_DIR}
     PUBLIC ${PROJECT_INCLUDE_DIR}
     PUBLIC ${PROJECT_INCLUDE_DIR}/Eigen
     PUBLIC ${XML_DIR}/include

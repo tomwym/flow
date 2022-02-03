@@ -1,5 +1,5 @@
 target_sources(flow
-    PRIVATE
+    PUBLIC
         mesh.cpp
         shader.cpp
         window.cpp       

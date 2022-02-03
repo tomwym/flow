@@ -8,6 +8,8 @@
 #include <SDL2/SDL.h>
 
 #include "window.hpp"
+#include "geometry.hpp"
+#include "mesh.hpp"
 
 class State {
 public:
@@ -19,17 +21,22 @@ public:
         , key(thiskey)
         , nexts({{(char)(thiskey+1), next}}) {}
 
+    State* Transition(const char nextkey);
+    State* Spin(Window& wind);
+    virtual void StateSpecific(const SDL_Keycode k) {}
+
+    static void setGeom(Geometry* const _geom);
+    static void setMesh(Mesh* const _mesh);
+    static void setMasterkey(std::map<char, State* const> mep);
+protected:
+    static Geometry* geom;
+    static Mesh* mesh;
+private:
     static std::set<char> seen;
-    static std::map<char, State*> masterkey;
+    static std::map<char, State* const> masterkey;
     std::string m_name;
     char key;
     std::map<char, State*> nexts;
-
-    virtual State* Transition(const char nextkey);
-    virtual State* Spin(Window& wind);
-    virtual void StateSpecific(const SDL_Keycode k) {}
-protected:
-private:
 };
 
 
@@ -40,13 +47,17 @@ public:
     State0(const std::string& name, const char thiskey, State* const next)
         : State(name, thiskey, next) {}
 
-    State* Transition(const char nextkey);
     // State* Spin(Window& wind);
     void Orient();
     void Resize();
+    void IncrementAxis();
+    void DecrementAxis();
+    void IncrementRotation();
+    void DecrementRotation();
     void StateSpecific(const SDL_Keycode k);
 protected:
 private:
+    const float rotation_step = M_PI/8;
 };
 
 class State1 : public State {

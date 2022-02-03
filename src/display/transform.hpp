@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "Eigen/Dense"
 
 #include "display.hpp"
 
@@ -34,6 +35,12 @@ public:
 
     inline void SetPos(const glm::vec3& pos) { m_pos = pos; }
     inline void SetRot(const glm::vec3& rot) { m_rot = rot; }
+    template<typename T>
+    void UpdateRotation(const T& rotation) {
+        m_rot[0] = rotation[0];
+        m_rot[1] = rotation[1];
+        m_rot[2] = rotation[2];
+    }
     inline void SetScale(const glm::vec3& scale) { m_scale = scale; }
 
 protected:

@@ -48,12 +48,6 @@ void Window::ClearScreen(const float r, const float g, const float b, const floa
 
 void Window::Update() {
     SDL_GL_SwapWindow(m_window);
-    SDL_Event e;
-    while (SDL_PollEvent(&e)) {
-        if (e.type == SDL_QUIT) {
-            isClosed = true;
-        }
-    }
 }
 
 void Window::UpdateTransitions() {

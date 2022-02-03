@@ -9,6 +9,9 @@
 class Mesh : public Display {
 public:
     Mesh(const std::vector<glm::vec3>& vertices1, const std::vector<glm::vec3>& vertices2);
+    void UpdateStatic(const std::vector<glm::vec3>& vertices);
+    void UpdateDynamic(const std::vector<>& vertices);
+
     void Draw(const std::vector<glm::vec3>& vertices, 
               const int n_elements, const int element_size);
     virtual ~Mesh();
@@ -27,5 +30,5 @@ private:
     GLuint m_vao[NUM_VAO];
     GLuint m_vbo[NUM_VBO];
 
-    unsigned int m_drawCount[2];
+    unsigned int m_drawCount[2] = {0, 0};
 };
