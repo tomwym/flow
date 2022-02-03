@@ -25,7 +25,7 @@ int main() {
                                  glm::vec3(-0.05, -0.05, 0),
                                  glm::vec3( 0.05,  0.05, 0),
                                  glm::vec3( 0.05, -0.05, 0)});
-    float theta = 0;                                 
+    float theta = 0;
     std::vector<glm::vec3> fdsa(makeTriangle<void>(Display::m_width, Display::m_height, theta, 200));
 
     E57Handle e57obj;
@@ -70,7 +70,7 @@ int main() {
     std::cout << RT << '\n';
     A = A * RT.transpose();
     A = A.block(0, 0, A.rows(), 3);
-    // transpose and 
+    // transpose and
 
     Eigen::MatrixXf B = A.transpose() * A;
     Eigen::JacobiSVD<Eigen::MatrixXf> svdobj(B, Eigen::ComputeFullU | Eigen::ComputeFullV);
@@ -78,7 +78,7 @@ int main() {
     std::cout << C.rows() << ' ' << C.cols() << '\n';
     */
     std::vector<glm::vec3> temp(convertPoints<void>(geom.GetNormalizedData()));
-    
+
     Window wind("flow");
     Mesh mesh(temp, fdsa);
     Shader shader("./res/basicShader");
@@ -115,7 +115,7 @@ int main() {
         here = here->Spin(wind);
         wind.LimitFrames();
         theta += M_PI/60;
-	}    
+	}
     return 0;
 
 }

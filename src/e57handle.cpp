@@ -36,8 +36,8 @@ void E57Handle::SetRoot() {
     } else {
         return;
     }
-    
-    // ctor StructureNode::StructureNode(const Node& n)	
+
+    // ctor StructureNode::StructureNode(const Node& n)
     m_root = std::make_unique<e57::StructureNode>(m_imf->root());
     return;
 }
@@ -56,7 +56,7 @@ void E57Handle::SetPoints() {
     // get data3D child from root
     e57::VectorNode data3D(m_root->get("data3D"));
     // assuming data3D vector only has one object in vector (take first index)
-    // vectorChild points to the first instance in data3D 
+    // vectorChild points to the first instance in data3D
     e57::StructureNode vectorChild(data3D.get("0"));
     // get points from the instance of data3D
     m_points = std::make_unique<e57::CompressedVectorNode>(vectorChild.get("points"));
@@ -66,8 +66,8 @@ void E57Handle::SetPoints() {
 // the prototype node defines the structure of the data in a CompressedVectorNode
 void E57Handle::SetPrototype() {
     std::cout << "SetPrototype" << '\n';
-    // m_M returns the number of elements recorded in points 
-    // == count of number of 3d points 
+    // m_M returns the number of elements recorded in points
+    // == count of number of 3d points
     // roughly: sizeof(points) == m_M * sizeof(typename Prototype)
     m_M = m_points->childCount();
     if (m_points->prototype().type() != e57::E57_STRUCTURE) {
@@ -77,7 +77,7 @@ void E57Handle::SetPrototype() {
     m_prototype = std::make_unique<e57::StructureNode>(
                     static_cast<e57::StructureNode>(m_points->prototype())
                 );
-    // m_N gives the number of categories to record in the points struct 
+    // m_N gives the number of categories to record in the points struct
     // the number of primitive fields within the prototype struct
     m_N = m_prototype->childCount();
     return;
@@ -111,10 +111,10 @@ void E57Handle::SetData() {
             // create empty bufffer than can hold data, here assumed floats
             std::vector<float> rawValue(m_M);
 
-            // not exactly sure what's going on here, but need a vector of 
-            // SourceDestBuffer object, and cannot be empty 
+            // not exactly sure what's going on here, but need a vector of
+            // SourceDestBuffer object, and cannot be empty
             std::vector<e57::SourceDestBuffer> vdestbufs;
-            e57::SourceDestBuffer srcDestBuff(*m_imf.get(), n.pathName(), rawValue.data(), 
+            e57::SourceDestBuffer srcDestBuff(*m_imf.get(), n.pathName(), rawValue.data(),
                                               m_M, true, false);
             vdestbufs.push_back(srcDestBuff);
 
@@ -126,9 +126,9 @@ void E57Handle::SetData() {
                 return;
             }
 
-            std::cout << " Read " << m_M << " records from " 
+            std::cout << " Read " << m_M << " records from "
                       << reader.compressedVectorNode().pathName() << '\n';
-            
+
             // this doesn't work for some reason... :p
             //tracking[i].assign(std::begin(rawValue), std::end(rawValue));
             m_data[i].assign(rawValue.begin(), rawValue.end());
@@ -162,7 +162,7 @@ void E57Handle::SetIntermediateFile() {
 }
 
 
-// wrapper for all Set functions 
+// wrapper for all Set functions
 void E57Handle::SetAll() {
     std::cout << "SetAll" << '\n';
     SetFileName(DEFAULT_NAME);
@@ -213,6 +213,6 @@ std::ostream& operator<<(std::ostream& out, const e57::NodeType& value) {
         INSERT_ELEMENT(e57::E57_STRING           );
         INSERT_ELEMENT(e57::E57_BLOB             );
         #undef INSERT_ELEMENT
-    }   
+    }
     return out << strings[value];
 }

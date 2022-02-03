@@ -8,7 +8,7 @@
 #include "camera.hpp"
 
 class Shader : public Display {
-public: 
+public:
     Shader(const std::string& fileName);
 
     void Bind();

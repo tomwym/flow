@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "display.hpp"
 
@@ -12,13 +12,13 @@ public:
     void UpdateStatic(const std::vector<glm::vec3>& vertices);
     void UpdateDynamic(const std::vector<glm::vec3>& vertices);
 
-    void Draw(const std::vector<glm::vec3>& vertices, 
+    void Draw(const std::vector<glm::vec3>& vertices,
               const int n_elements, const int element_size);
     virtual ~Mesh();
 protected:
 private:
     Mesh(const Mesh& other) = delete;
-    void operator=(const Mesh& other) = delete;  
+    void operator=(const Mesh& other) = delete;
 
     enum {
         POSITION_VB,

@@ -16,7 +16,7 @@ class State {
 public:
     State(const std::string& name, const char thiskey)
         : m_name(name)
-        , key(thiskey) {}        
+        , key(thiskey) {}
     State(const std::string& name, const char thiskey, State* const next)
         : m_name(name)
         , key(thiskey)

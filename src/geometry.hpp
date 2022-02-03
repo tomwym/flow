@@ -7,7 +7,7 @@
 
 /**
  * Container class for processed data
- * 
+ *
  */
 
 class Geometry {
@@ -22,7 +22,7 @@ public:
     /* [5] */   void CollectPlanarData();
     /* [6] */   void CollectReducedData();
     /* [7] */   void CollectBoundaryPoints();
-    
+
     static std::vector<glm::vec3> VectorFromEigen(const Eigen::MatrixXf& matrix);
     const Eigen::MatrixXf& GetNormalizedData() const;
     const Eigen::MatrixXf& GetPlanarData() const;

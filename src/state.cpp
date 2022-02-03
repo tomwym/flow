@@ -142,5 +142,5 @@ void State0::IncrementRotation() {
 
 void State0::DecrementRotation() {
     geom->m_rotation_vals[geom->current_axis] -= rotation_step;
-    transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);    
+    transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
 }

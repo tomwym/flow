@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cmath>
 
-Geometry::Geometry(const E57Handle* const _e57objp) 
+Geometry::Geometry(const E57Handle* const _e57objp)
     : e57objp(_e57objp) {
 }
 
@@ -33,7 +33,7 @@ void Geometry::CollectNormalizedData() {
     m_normalizedData = m_rawData;
     std::vector<float> deltas {};
     deltas.reserve(m_normalizedData.cols());
-    
+
     for (auto col : m_normalizedData.colwise()) {
         const float maxval = col.maxCoeff();
         const float minval = col.minCoeff();
@@ -103,7 +103,7 @@ void Geometry::CollectPlanarData() {
         // [0, 0, 1]
         const float mag = row.dot(m_view_normal);
         // pprime is the point which now exists on the plane
-        const Eigen::Vector3f pprime = row.transpose() - mag*m_view_normal;
+        const Eigen::Vector3f pprime = row.transpose() - mag * m_view_normal;
         const float projxprime = pprime.dot(e_x);
         const float projyprime = pprime.dot(e_y);
         m_planarData(i,0) = projxprime;

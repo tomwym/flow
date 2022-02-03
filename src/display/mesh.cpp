@@ -49,7 +49,7 @@ Mesh::~Mesh() {
     glDeleteVertexArrays(NUM_VAO, m_vao);
 }
 
-void Mesh::Draw(const std::vector<glm::vec3>& vertices, 
+void Mesh::Draw(const std::vector<glm::vec3>& vertices,
                 const int n_elements, const int element_size) {
     glColor4f( 1.0, 0.0, 0.0, 1.0 );
     std::vector<GLint> startingElements(n_elements);

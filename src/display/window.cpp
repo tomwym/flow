@@ -70,7 +70,7 @@ SDL_Event e;
             default: std::cout << "not recognized\n";
             }
         }
-    }    
+    }
 }
 
 void Window::LimitFrames() {

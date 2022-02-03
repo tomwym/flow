@@ -57,13 +57,13 @@ std::string Shader::LoadShader(const std::string& fileName) {
     return output;
 }
 
-void Shader::CheckShaderError(const GLuint shader, 
-                              const GLuint flag, 
-                              const bool isProgram, 
+void Shader::CheckShaderError(const GLuint shader,
+                              const GLuint flag,
+                              const bool isProgram,
                               const std::string& errorMessage) {
     GLint success = 0;
     GLchar error[1024] = { 0 };
-    
+
     if (isProgram) {
         glGetProgramiv(shader, flag, &success);
     } else {
@@ -84,7 +84,7 @@ GLuint Shader::CreateShader(const std::string& text, const unsigned int type) {
      GLuint shader = glCreateShader(type);
 
      if (shader == 0) {
-         std::cerr << "Error compiling shader type " << type << std::endl;  
+         std::cerr << "Error compiling shader type " << type << std::endl;
      }
 
      const GLchar* shaderSourceStrings[1];
