@@ -79,11 +79,14 @@ State* State::Spin(Window& wind) {
 void State0::StateSpecific(const SDL_Keycode k) {
     //std::cout << "in state 0 statespecific" << '\n';
     switch (k) {
-    case SDLK_o:
+    case SDLK_p:
         this->Show3D();
         break;
-    case SDLK_p:
+    case SDLK_o:
         this->Show2D();
+        break;
+    case SDLK_i:
+        this->ReducePoints();
         break;
     case SDLK_UP:
         this->IncrementAxis();
@@ -102,21 +105,24 @@ void State0::StateSpecific(const SDL_Keycode k) {
     }
 }
 
-void State0::Orient() {
-    std::cout << "state 0 orient" << '\n';
-}
-
-// o
+// p
 void State0::Show3D() {
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetNormalizedData()));
 }
 
-// p
+// o
 void State0::Show2D() {
     geom->CollectPlanarData();
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
+}
+
+// i
+void State0::ReducePoints() {
+    geom->CollectReducedData();
+    transform->UpdateRotation<std::vector<float>>({0,0,0});
+    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetReducedData()));
 }
 
 void State0::IncrementAxis() {

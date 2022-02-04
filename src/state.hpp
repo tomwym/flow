@@ -51,10 +51,9 @@ public:
         : State(name, thiskey, next) {}
 
     // State* Spin(Window& wind);
-    void Orient();
-    void Resize();
     void Show3D();
     void Show2D();
+    void ReducePoints();
     void IncrementAxis();
     void DecrementAxis();
     void IncrementRotation();

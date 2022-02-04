@@ -4,6 +4,7 @@
 #include "Eigen/Dense"
 
 #include "e57handle.hpp"
+#include "algorithms.hpp"
 
 /**
  * Container class for processed data
@@ -17,15 +18,17 @@ public:
     /* [1] */   void CollectNormalizedData();
                 template<typename T>
     /* [2] */   Eigen::Matrix3f CollectRotationMatrix(const T& rotations);
-    /* [3] */   void CollectTranslationVector();
-    /* [4] */   void CollectTransformedData();
+    /* [3] */   //void CollectTranslationVector();
+    /* [4] */   //void CollectTransformedData();
     /* [5] */   void CollectPlanarData();
+                Eigen::MatrixXf ReduceSize(const size_t size, const Eigen::MatrixXf& input) const;
     /* [6] */   void CollectReducedData();
     /* [7] */   void CollectBoundaryPoints();
 
     static std::vector<glm::vec3> VectorFromEigen(const Eigen::MatrixXf& matrix);
     const Eigen::MatrixXf& GetNormalizedData() const;
     const Eigen::MatrixXf& GetPlanarData() const;
+    const Eigen::MatrixXf& GetReducedData() const;
 
     Eigen::Vector3f m_rotation_vals = {0, 0, 0};
     int current_axis = 0;
@@ -37,9 +40,9 @@ private:
 
     /* [0] */   Eigen::MatrixXf m_rawData; //.[L]
     /* [1] */   Eigen::MatrixXf m_normalizedData; //.[L]
-    /* [2] */   Eigen::Matrix3f m_rotationMatrix;
+    /* [2] */   //Eigen::Matrix3f m_rotationMatrix;
                 Eigen::Vector3f m_view_normal = {0, 0, 1};
-    /* [4] */   Eigen::MatrixXf m_transformedData; //.[L]
+    /* [4] */   //Eigen::MatrixXf m_transformedData; //.[L]
     /* [5] */   Eigen::MatrixXf m_planarData; //.[L]
     /* [6] */   Eigen::MatrixXf m_reducedData;
     /* [6] */   Eigen::MatrixXf m_boundaryPoints;

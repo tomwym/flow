@@ -76,13 +76,6 @@ Eigen::Matrix3f Geometry::CollectRotationMatrix(const T& rotations) {
     return rotZ * rotY * rotX;
 }
 
-void Geometry::CollectTranslationVector() {
-
-}
-
-void Geometry::CollectTransformedData() {
-
-}
 
 void Geometry::CollectPlanarData() {
     m_planarData = Eigen::MatrixXf(m_normalizedData.rows(), 3);
@@ -113,8 +106,22 @@ void Geometry::CollectPlanarData() {
     }
 }
 
-void Geometry::CollectReducedData() {
 
+Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& input) const {
+    Eigen::MatrixXf out(size, input.cols());
+    Eigen::VectorXf random_indices = Eigen::VectorXf::Random(size);
+    const int lower = 0;
+    const int upper = input.rows()-1;
+    random_indices *= (upper-lower)/2;
+    random_indices.array() += ((float)upper-(float)lower)/2;
+    for (int i=0; i<size; ++i) {
+        out.row(i) = input.row((int)random_indices(i));
+    }
+    return out;
+}
+
+void Geometry::CollectReducedData() {
+    m_reducedData = KMeans<void>(ReduceSize(10000, m_planarData));
 }
 
 void Geometry::CollectBoundaryPoints() {
@@ -128,4 +135,8 @@ const Eigen::MatrixXf& Geometry::GetNormalizedData() const {
 
 const Eigen::MatrixXf& Geometry::GetPlanarData() const {
     return m_planarData;
+}
+
+const Eigen::MatrixXf& Geometry::GetReducedData() const {
+    return m_reducedData;
 }
