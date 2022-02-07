@@ -108,6 +108,7 @@ void State0::StateSpecific(const SDL_Keycode k) {
 // p
 void State0::Show3D() {
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
+    std::cout << geom->m_rotation_vals.transpose() << '\n';
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetNormalizedData()));
 }
 
@@ -115,38 +116,47 @@ void State0::Show3D() {
 void State0::Show2D() {
     geom->CollectPlanarData();
     transform->UpdateRotation<std::vector<float>>({0,0,0});
-    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
+    std::cout << geom->m_rotation_vals.transpose() << '\n';
+    // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
+    mesh->UpdateStatic(Geometry::VectorFromEigen(Geometry::ReduceSize(5000, geom->GetPlanarData())));}
+
+// i // DOES NOT WORK PROPERLY
+void State0::ReducePoints() {
+    geom->CollectClusteredData(geom->GetReducedPlanarData());
+    transform->UpdateRotation<std::vector<float>>({0,0,0});
+    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetClusteredData()));
 }
 
-// i
-void State0::ReducePoints() {
-    geom->CollectReducedData();
-    transform->UpdateRotation<std::vector<float>>({0,0,0});
-    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetReducedData()));
+void  State0::SearchForBoundary() {
+    
 }
 
 void State0::IncrementAxis() {
-    const size_t n_axis = geom->m_rotation_vals.size()-1;
-    const size_t incremented = ++(geom->current_axis);
-    if (incremented > n_axis) {
-        geom->current_axis = 0;
+    const size_t axis_max_index = geom->m_rotation_vals.size()-1;
+    const size_t incremented = geom->GetCurrentAxis()+1;
+    if (incremented > axis_max_index) {
+        geom->SetCurrentAxis(0);
+    } else {
+        geom->SetCurrentAxis(incremented);
     }
 }
 
 void State0::DecrementAxis() {
-    const size_t n_axis = geom->m_rotation_vals.size()-1;
-    const int decremented = --(geom->current_axis);
+    const size_t axis_max_index = geom->m_rotation_vals.size()-1;
+    const int decremented = geom->GetCurrentAxis()-1;
     if (decremented < 0) {
-        geom->current_axis = n_axis;
+        geom->SetCurrentAxis(axis_max_index);
+    } else {
+        geom->SetCurrentAxis(decremented);
     }
 }
 
 void State0::IncrementRotation() {
-    geom->m_rotation_vals[geom->current_axis] += rotation_step;
+    geom->m_rotation_vals[geom->GetCurrentAxis()] += this->rotation_step;
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
 }
 
 void State0::DecrementRotation() {
-    geom->m_rotation_vals[geom->current_axis] -= rotation_step;
+    geom->m_rotation_vals[geom->GetCurrentAxis()] -= rotation_step;
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
 }

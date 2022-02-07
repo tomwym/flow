@@ -64,8 +64,8 @@ Eigen::Matrix3f Geometry::CollectRotationMatrix(const T& rotations) {
     const float cy = std::cos(y);
     const float sy = std::sin(y);
     Eigen::Matrix3f rotY = Eigen::Matrix3f::Identity();
-    rotY(0,0) = cy; rotY(0,2) = -sy;
-    rotY(2,0) = sy; rotY(2,2) = cy;
+    rotY(0,0) = cy; rotY(0,2) = sy;
+    rotY(2,0) = -sy; rotY(2,2) = cy;
 
     const float cx = std::cos(x);
     const float sx = std::sin(x);
@@ -104,10 +104,11 @@ void Geometry::CollectPlanarData() {
         m_planarData(i,2) = 0;
         ++i;
     }
+    m_reducedPlanarData = Geometry::ReduceSize(m_planarData.rows()/20, m_planarData);
 }
 
 
-Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& input) const {
+Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& input) {
     Eigen::MatrixXf out(size, input.cols());
     Eigen::VectorXf random_indices = Eigen::VectorXf::Random(size);
     const int lower = 0;
@@ -120,12 +121,13 @@ Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& i
     return out;
 }
 
-void Geometry::CollectReducedData() {
-    m_reducedData = KMeans<void>(ReduceSize(10000, m_planarData));
+void Geometry::CollectClusteredData(const Eigen::MatrixXf& input) {
+    m_clusteredData = KMeans<void>(Geometry::ReduceSize(10000, input));
 }
 
 void Geometry::CollectBoundaryPoints() {
-
+    // start off with matrix input
+    
 }
 
 
@@ -137,6 +139,10 @@ const Eigen::MatrixXf& Geometry::GetPlanarData() const {
     return m_planarData;
 }
 
-const Eigen::MatrixXf& Geometry::GetReducedData() const {
-    return m_reducedData;
+const Eigen::MatrixXf& Geometry::GetReducedPlanarData() const {
+    return m_reducedPlanarData;
+}
+
+const Eigen::MatrixXf& Geometry::GetClusteredData() const {
+    return m_clusteredData;
 }

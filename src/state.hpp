@@ -54,14 +54,15 @@ public:
     void Show3D();
     void Show2D();
     void ReducePoints();
+    void SearchForBoundary();
     void IncrementAxis();
     void DecrementAxis();
     void IncrementRotation();
     void DecrementRotation();
-    void StateSpecific(const SDL_Keycode k);
 protected:
 private:
-    const float rotation_step = M_PI/8;
+    void StateSpecific(const SDL_Keycode k);
+    const float rotation_step = M_PI/8.;
 };
 
 class State1 : public State {
