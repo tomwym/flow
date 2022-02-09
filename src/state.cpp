@@ -1,5 +1,6 @@
 #include "state.hpp"
 
+#include <fstream>
 #include "functions.hpp"
 
 // static initializations
@@ -43,7 +44,7 @@ State* State::Transition(const char nextkey) {
         std::cout << "did not transition for " << nextkey << '\n';
     }
     return out;
-} 
+}
 
 State* State::Spin(Window& wind) {
     SDL_Event e;
@@ -86,7 +87,10 @@ void State0::StateSpecific(const SDL_Keycode k) {
         this->Show2D();
         break;
     case SDLK_i:
-        this->ReducePoints();
+        // this->ReducePoints();
+        break;
+    case SDLK_u:
+        this->SearchForBoundary();
         break;
     case SDLK_UP:
         this->IncrementAxis();
@@ -110,6 +114,7 @@ void State0::Show3D() {
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
     std::cout << geom->m_rotation_vals.transpose() << '\n';
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetNormalizedData()));
+    mesh->SetDrawStaticPrimitive(GL_POINTS);
 }
 
 // o
@@ -118,17 +123,34 @@ void State0::Show2D() {
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     std::cout << geom->m_rotation_vals.transpose() << '\n';
     // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
-    mesh->UpdateStatic(Geometry::VectorFromEigen(Geometry::ReduceSize(5000, geom->GetPlanarData())));}
+    mesh->UpdateStatic(Geometry::VectorFromEigen(Geometry::ReduceSize(5000, geom->GetPlanarData())));
+    mesh->SetDrawStaticPrimitive(GL_POINTS);
+
+    /*
+    const Eigen::MatrixXf obj = Geometry::ReduceSize(5000, geom->GetPlanarData());
+    std::ofstream o("temp.dat");
+    for (const auto& row : obj.rowwise()) {
+        o << row << '\n';
+    }
+    o.close();
+    */
+}
 
 // i // DOES NOT WORK PROPERLY
 void State0::ReducePoints() {
     geom->CollectClusteredData(geom->GetReducedPlanarData());
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetClusteredData()));
+    mesh->SetDrawStaticPrimitive(GL_POINTS);
+
 }
 
-void  State0::SearchForBoundary() {
-    
+// u
+void State0::SearchForBoundary() {
+    geom->CollectBoundaryPoints();
+    transform->UpdateRotation<std::vector<float>>({0,0,0});
+    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetBoundaryPoints()));
+    mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
 }
 
 void State0::IncrementAxis() {

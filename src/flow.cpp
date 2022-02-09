@@ -102,6 +102,8 @@ int main() {
                          {'2', &st2},
                          {'3', &st3}});
 
+    mesh.SetDrawDynamicPrimitive(GL_TRIANGLES);
+
 	while(!wind.IsClosed()) {
 		wind.ClearScreen(0.0f, 0.2f, 0.4f, 1.0f);
         // transform.GetPos().x = sinf(counter);
@@ -110,9 +112,11 @@ int main() {
         fdsa = makeTriangle<void>(Display::m_width, Display::m_height, theta, 800);
         // transform.UpdateRotation<Eigen::Vector3f>(geom.m_rotation_vals);
         shader.Update(transform, camera);
-        mesh.Draw(fdsa, 2, 12);
-        wind.Update();
         here = here->Spin(wind);
+        mesh.UpdateDynamic(fdsa);
+        mesh.Draw();
+        wind.Update();
+
         wind.LimitFrames();
         theta += M_PI/60;
 	}

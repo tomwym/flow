@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 Geometry::Geometry(const E57Handle* const _e57objp)
     : e57objp(_e57objp) {
@@ -115,7 +116,7 @@ Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& i
     const int upper = input.rows()-1;
     random_indices *= (upper-lower)/2;
     random_indices.array() += ((float)upper-(float)lower)/2;
-    for (int i=0; i<size; ++i) {
+    for (size_t i=0; i<size; ++i) {
         out.row(i) = input.row((int)random_indices(i));
     }
     return out;
@@ -127,7 +128,24 @@ void Geometry::CollectClusteredData(const Eigen::MatrixXf& input) {
 
 void Geometry::CollectBoundaryPoints() {
     // start off with matrix input
-    
+    std::ifstream ifs("./dat/bunnyBoundary.dat");
+    std::string buffer;
+    std::getline(ifs, buffer, '\n');
+    std::stringstream lineStream(buffer);
+
+    std::vector<float> container;
+
+    while (std::getline(ifs, buffer, '\n')) {
+        std::stringstream ss(buffer);
+        float temp = 0;
+        ss >> temp;
+        container.push_back(temp);
+        ss >> temp;
+        container.push_back(temp);
+        container.push_back(0);
+    }
+    m_boundaryPoints = Eigen::Map<const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
+        (container.data(), container.size()/3, 3);
 }
 
 
@@ -145,4 +163,8 @@ const Eigen::MatrixXf& Geometry::GetReducedPlanarData() const {
 
 const Eigen::MatrixXf& Geometry::GetClusteredData() const {
     return m_clusteredData;
+}
+
+const Eigen::MatrixXf& Geometry::GetBoundaryPoints() const {
+    return m_boundaryPoints;
 }

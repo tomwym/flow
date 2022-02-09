@@ -14,6 +14,12 @@
 class Geometry {
 public:
     Geometry(const E57Handle* const _e57objp);
+
+    // ideall, reduce the need to type 
+    // geom->somefunction();
+    // geom->Update*(arg);
+    // geom->SetDraw*Primitive*(arg);
+    void Interface( void(Geometry::*mainf)() );
     void CollectRawData();
     void CollectNormalizedData();
     template<typename T>
@@ -28,6 +34,7 @@ public:
     const Eigen::MatrixXf& GetPlanarData() const;
     const Eigen::MatrixXf& GetReducedPlanarData() const;
     const Eigen::MatrixXf& GetClusteredData() const;
+    const Eigen::MatrixXf& GetBoundaryPoints() const;
 
     Eigen::Vector3f m_rotation_vals = {0, 0, 0};
     const int GetCurrentAxis() const { return current_axis; }

@@ -11,9 +11,10 @@ public:
     Mesh(const std::vector<glm::vec3>& vertices1, const std::vector<glm::vec3>& vertices2);
     void UpdateStatic(const std::vector<glm::vec3>& vertices);
     void UpdateDynamic(const std::vector<glm::vec3>& vertices);
+    void SetDrawStaticPrimitive(const unsigned in);
+    void SetDrawDynamicPrimitive(const unsigned in);
 
-    void Draw(const std::vector<glm::vec3>& vertices,
-              const int n_elements, const int element_size);
+    void Draw();
     virtual ~Mesh();
 protected:
 private:
@@ -31,4 +32,7 @@ private:
     GLuint m_vbo[NUM_VBO];
 
     unsigned int m_drawCount[2] = {0, 0};
+
+    unsigned DRAW_STATIC_PRIMIVE = GL_POINTS;
+    unsigned DRAW_DYNAMIC_PRIMIVE = GL_POINTS;
 };
