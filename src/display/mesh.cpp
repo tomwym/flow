@@ -1,5 +1,6 @@
 #include "mesh.hpp"
 
+#include <algorithm>
 #include <numeric>
 #include <GL/glew.h>
 
@@ -11,9 +12,9 @@ Mesh::Mesh(const std::vector<glm::vec3>& vertices1,
     glGenBuffers(NUM_VBO, m_vbo);
 
     // static mesh
-    UpdateStatic(vertices1);
+    UpdateStatic({});
     // dynamic mesh
-    UpdateDynamic(vertices2);
+    UpdateDynamic({});
 }
 
 void Mesh::UpdateStatic(const std::vector<glm::vec3>& vertices) {
@@ -57,6 +58,27 @@ void Mesh::Draw() {
 
     glBindVertexArray(m_vao[1]);
     glDrawArrays(DRAW_DYNAMIC_PRIMIVE, 0, m_drawCount[1]);
+
+    glBindVertexArray(0);
+}
+
+void Mesh::DrawNArrays(const unsigned n_elements, const unsigned element_size) {
+    glColor4f( 1.0, 0.0, 0.0, 1.0 );
+
+    glBindVertexArray(m_vao[0]);
+    glDrawArrays(DRAW_STATIC_PRIMIVE, 0, m_drawCount[0]);
+
+    glBindVertexArray(m_vao[1]);
+
+    std::vector<GLint> startingElements(n_elements);
+    // creates {0,1,2,...}
+    std::iota(startingElements.begin(), startingElements.end(), 0);
+    // -> {0,c,2*c,3*c,...}
+    transform(startingElements.begin(), startingElements.end(),
+              startingElements.begin(),
+              [element_size](int &c){ return c*element_size; });
+    std::vector<GLint> counts(n_elements, element_size);
+    glMultiDrawArrays(DRAW_DYNAMIC_PRIMIVE, startingElements.data(), counts.data(), n_elements);
 
     glBindVertexArray(0);
 }

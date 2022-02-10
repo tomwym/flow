@@ -95,6 +95,7 @@ int main() {
     State* here = &st0;
     // static interface initializations
     State::setGeom(&geom);
+    State::setWind(&wind);
     State::setMesh(&mesh);
     State::setTransform(&transform);
     State::setMasterkey({{'0', &st0},

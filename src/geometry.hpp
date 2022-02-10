@@ -15,7 +15,7 @@ class Geometry {
 public:
     Geometry(const E57Handle* const _e57objp);
 
-    // ideall, reduce the need to type 
+    // ideall, reduce the need to type
     // geom->somefunction();
     // geom->Update*(arg);
     // geom->SetDraw*Primitive*(arg);
@@ -45,7 +45,7 @@ public:
 
 protected:
 private:
-    Geometry();
+    Geometry() = delete;
     const E57Handle* const e57objp;
     int m_itemcount = 0;
     Eigen::Vector3f m_view_normal = {0, 0, 1};

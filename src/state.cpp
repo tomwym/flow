@@ -1,17 +1,25 @@
 #include "state.hpp"
 
 #include <fstream>
+#include <algorithm>
+#include <numeric>
+#include "fluids.hpp"
 #include "functions.hpp"
 
 // static initializations
 std::set<char> State::seen = {'0'};
 std::map<char, State* const> State::masterkey = {};
 Geometry* State::geom = nullptr;
+Window* State::wind = nullptr;
 Mesh* State::mesh = nullptr;
 Transform* State::transform = nullptr;
 
 void State::setGeom(Geometry* const _geom) {
     geom = _geom;
+}
+
+void State::setWind(Window* const _wind) {
+    wind = _wind;
 }
 
 void State::setMesh(Mesh* const _mesh) {
@@ -181,4 +189,37 @@ void State0::IncrementRotation() {
 void State0::DecrementRotation() {
     geom->m_rotation_vals[geom->GetCurrentAxis()] -= rotation_step;
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
+}
+
+void State1::StateSpecific(const SDL_Keycode k) {
+    //std::cout << "in state 0 statespecific" << '\n';
+    switch (k) {
+    case SDLK_l:
+        this->Hello();
+        break;
+    default:
+        {} //std::cout << "state specific not found\n";
+    }
+}
+
+void State1::Hello() {
+    transform->UpdateRotation<std::vector<float>>({0,0,0});
+    mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
+
+    Fluids fluidhandle;
+    fluidhandle.InitializeSPH();
+
+    int iterations = 60*3;
+
+    for (int i=0; i<iterations; ++i) {
+        fluidhandle.ComputeRhoP();
+        fluidhandle.ComputeForces();
+        fluidhandle.Integrate();
+        std::vector<glm::vec3> fdsa = fluidhandle.MakeParticlesDrawable();
+		wind->ClearScreen(0.0f, 0.2f, 0.4f, 1.0f);
+        mesh->UpdateDynamic(fdsa);
+        mesh->DrawNArrays(fdsa.size(), Particle::NUM_POINTS_PER_PARTICLE+2);
+        wind->Update();
+        wind->LimitFrames();
+    }
 }

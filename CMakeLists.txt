@@ -3,14 +3,15 @@ cmake_minimum_required(VERSION 3.16)
 project(FLOW)
 
 # project type
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # specify the C++ standard
+set(CMAKE_CXX_COMPILER "g++-11")
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -32,21 +33,22 @@ set(SOURCES
     ${PROJECT_SOURCE_DIR}/e57handle.cpp
     ${PROJECT_SOURCE_DIR}/geometry.cpp
     ${PROJECT_SOURCE_DIR}/state.cpp
+    ${PROJECT_SOURCE_DIR}/fluids.cpp
 )
 
 add_executable(flow ${SOURCES})
 add_subdirectory(src/display)
 
-# find xerces library needed for .so 
+# find xerces library needed for .so
 set(XERCES_DIR ${PROJECT_DEPENDENCIES_DIR}/xerces)
-find_library(XERCES_LIB 
+find_library(XERCES_LIB
     NAMES xerces
     HINTS ${XERCES_DIR}/lib)
 
 # find E57RefImpl for static linking
 set(E57_DIR ${PROJECT_DEPENDENCIES_DIR}/E57RefImpl)
 find_library(E57_LIB
-    NAMES E57RefImpl 
+    NAMES E57RefImpl
     HINTS ${E57_DIR}/lib)
 
 find_package(SDL2 REQUIRED)

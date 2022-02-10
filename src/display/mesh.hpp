@@ -15,6 +15,7 @@ public:
     void SetDrawDynamicPrimitive(const unsigned in);
 
     void Draw();
+    void DrawNArrays(const unsigned n_elements, const unsigned element_size);
     virtual ~Mesh();
 protected:
 private:

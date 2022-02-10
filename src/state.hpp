@@ -27,11 +27,13 @@ public:
     virtual void StateSpecific(const SDL_Keycode k) {}
 
     static void setGeom(Geometry* const _geom);
+    static void setWind(Window* const _wind);
     static void setMesh(Mesh* const _mesh);
     static void setTransform(Transform* const _transform);
     static void setMasterkey(std::map<char, State* const> mep);
 protected:
     static Geometry* geom;
+    static Window* wind;
     static Mesh* mesh;
     static Transform* transform;
 private:
@@ -50,7 +52,10 @@ public:
     State0(const std::string& name, const char thiskey, State* const next)
         : State(name, thiskey, next) {}
 
-    // State* Spin(Window& wind);
+protected:
+private:
+    void StateSpecific(const SDL_Keycode k);
+
     void Show3D();
     void Show2D();
     void ReducePoints();
@@ -59,9 +64,7 @@ public:
     void DecrementAxis();
     void IncrementRotation();
     void DecrementRotation();
-protected:
-private:
-    void StateSpecific(const SDL_Keycode k);
+
     const float rotation_step = M_PI/8.;
 };
 
@@ -73,6 +76,9 @@ public:
         : State(name, thiskey, next) {}
 protected:
 private:
+    void StateSpecific(const SDL_Keycode k);
+
+    void Hello();
 };
 
 class State2 : public State {
