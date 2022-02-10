@@ -6,7 +6,7 @@
  */
 
 E57Handle::E57Handle()
-    : m_filename(""), m_M(0), m_N(0), m_protoname({}), m_data({{}}) {
+    : m_filename(DEFAULT_NAME), m_M(0), m_N(0), m_protoname({}), m_data({{}}) {
     std::cout << "default constructor!" << '\n';
 }
 
@@ -165,13 +165,13 @@ void E57Handle::SetIntermediateFile() {
 // wrapper for all Set functions
 void E57Handle::SetAll() {
     std::cout << "SetAll" << '\n';
-    SetFileName(DEFAULT_NAME);
+    //SetFileName(DEFAULT_NAME);
     SetRoot();
     SetPoints();
     SetPrototype();
     SetProtoname();
     SetData();
-    SetIntermediateFile();
+    //SetIntermediateFile();
 }
 
 std::vector<std::vector<float>>&& E57Handle::MoveData() {

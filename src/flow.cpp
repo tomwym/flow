@@ -18,7 +18,7 @@
 #include "state.hpp"
 #include "functions.hpp"
 
-int main() {
+int main(int argc, char** argv) {
     std::cout << "hello flow!" << std::endl;
 
     std::vector<glm::vec3> asdf({glm::vec3(-0.05,  0.05, 0),
@@ -29,6 +29,10 @@ int main() {
     std::vector<glm::vec3> fdsa(makeTriangle<void>(Display::m_width, Display::m_height, theta, 200));
 
     E57Handle e57obj;
+    if (argc > 1) {
+        std::cout << argc << ' ' << argv[1] << '\n';
+        e57obj.SetFileName(argv[1]);
+    }
     e57obj.SetAll();
     //e57obj.PrintData();
 

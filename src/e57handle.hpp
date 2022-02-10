@@ -15,7 +15,7 @@ public:
     E57Handle();
     E57Handle(const std::string&);
     ~E57Handle();
-
+    void SetFileName(const std::string&);
     void SetAll();
     void PrintData();
 
@@ -30,7 +30,6 @@ private:
     E57Handle(const E57Handle& other) {}
     void operator=(const E57Handle& other) {}
 
-    void SetFileName(const std::string&);
     void SetRoot();
     // Set {Points, Prototyype, Protoname} to instantiate dynamic objs on heap
     void SetPoints();
