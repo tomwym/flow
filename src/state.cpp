@@ -202,14 +202,21 @@ void State1::StateSpecific(const SDL_Keycode k) {
     }
 }
 
+// l
 void State1::Hello() {
     transform->UpdateRotation<std::vector<float>>({0,0,0});
-    mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
+    geom->GetCirclePrimitive();
+    mesh->UpdateStatic(geom->m_primitiveCircleScaled);
+    mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
 
-    Fluids fluidhandle;
+    mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
+    // initialize the flow object with the geometry of boundary nodes
+    FlowObject<glm::vec3> fo(geom->m_primitiveCircle);
+    Fluids fluidhandle(fo);
     fluidhandle.InitializeSPH();
 
-    int iterations = 60*3;
+    const int seconds = 2;
+    const int iterations = m_fps*seconds;
 
     for (int i=0; i<iterations; ++i) {
         fluidhandle.ComputeRhoP();

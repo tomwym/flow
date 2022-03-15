@@ -1,49 +1,27 @@
 #include "fluids.hpp"
 
-void Fluids::MoveToInlet(std::vector<Particle>& particles) {
-	int x = X_INIT;
-	int y = 0;
-	int _y = 0;
-	int sign_bit = 1;
-	int y_i = m_height/(4*H);
-	for (auto it=particles.begin(); it!=particles.end(); ++it) {
-		if (y_i <= 0) {
-			y_i = m_height/(4*H);
-			y = 0;
-			_y = 0;
-			x += 2*H;
-		}
-		--y_i;
-		it->position(0) = x;
-		_y += sign_bit * y;
-		it->position(1) = _y;
-		y += 2*H;
-		sign_bit *= -1;
-	}
-}
 
 void Fluids::MoveToInlet(std::vector<Particle*>& particles) {
+	static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<float> dis(-10, 10);
 	int x = X_INIT;
 	int y = 0;
-	int _y = 0;
 	int sign_bit = 1;
-	int y_i = m_height/(4*H);
+	int ii = 0;
 	for (auto it=particles.begin(); it!=particles.end(); ++it) {
 		Particle* itp = *it;
-		itp->velocity = {300,0,0};
-		if (y_i <= 0) {
-			y_i = m_height/(4*H);
-			y = 0;
-			_y = 0;
+		itp->InitVelocity();
+		itp->force = {0,0,0};
+        y += sign_bit*2*(ii++)*H;
+        if (std::abs(y) > m_height/2*0.8) {
+            y = 0;
 			x += 2*H;
-		}
-		--y_i;
-		itp->position(0) = x;
-		_y += sign_bit * y;
-		itp->position(1) = _y;
-		y += 2*H;
-		sign_bit *= -1;
-
+            ii = 1;
+        }
+		itp->position(0) = x + dis(gen);
+		itp->position(1) = y + dis(gen);
+        sign_bit *= -1;
 	}
 }
 
@@ -51,7 +29,11 @@ void Fluids::MoveToInlet(std::vector<Particle*>& particles) {
 void Fluids::InitializeSPH() {
     //m_particles.reserve(MAX_PARTICLES);
     m_particles = std::vector<Particle>(MAX_PARTICLES, Particle());
-	MoveToInlet(m_particles);
+	m_pparticles.reserve(MAX_PARTICLES);
+	for (auto& p : m_particles) {
+		m_pparticles.push_back(&p);
+	}
+	MoveToInlet(m_pparticles);
 }
 
 void Fluids::ComputeRhoP() {
@@ -70,6 +52,7 @@ void Fluids::ComputeRhoP() {
 			}
 		}
 		iti->p = GAS_CONST * (iti->rho - REST_DENS);
+		// std::cout << iti->p << ' ';
 	}
 }
 
@@ -93,57 +76,77 @@ void Fluids::ComputeForces(void)
 				fvisc += VISC * MASS * (itj->velocity - iti->velocity) / itj->rho * VISC_LAP * (H - r);
 			}
 		}
-		iti->force = fpress + fvisc;
+		//const Eigen::Vector3f GForce = G*MASS/iti->rho;
+		iti->force = fpress + fvisc; // + GForce;
 	}
 }
 
 
 void Fluids::Integrate()
 {
-	std::vector<Particle*> particlePtrs;
-	for (auto& p : m_particles) {
+	const auto temp = *m_pparticles[0];
+	//std::cout << temp.position(1) << ' ' << temp.position(1) << ' ' <<  temp.position(2) << '\n';
+	std::vector<Particle*> keepPtrs{};
+	std::vector<Particle*> removePtrs{};
+	for (auto& p : m_pparticles) {
+		bool keep = true;
 		// forward Euler integration
-		p.position += DT * p.velocity;
-		p.velocity += DT * p.force / p.rho;
+		p->position += DT * p->velocity;
+		p->velocity += DT * p->force / p->rho;
 
 		// enforce boundary conditions
+		// object interaction
+		if (p->position(0) < 0.25*m_height && p->position(0) > -0.25*m_height &&
+			p->position(1) < 0.25*m_height && p->position(1) > -0.25*m_height) {
+			bool pnp = m_flowObj.ParticleInObject(*p);
+			if (pnp) {
+				//std::cout << "position: " << p->position(0) << ' ' << p->position(1) << '\n';
+				auto dir = m_flowObj.FindClosestSeeegment({p->position(0), p->position(1),0});
+				//std::cout << "dir: " << dir[0] << ' ' << dir[1] << '\n';
+				p->position(0) += dir[0];
+				p->position(1) += dir[1];
+			}
+		}
 		// left x: -m_width/2 -> 0
-		if (p.position(0) - EPS < -m_width/2)
-		{
-			p.velocity(0) *= BOUND_DAMPING;
-			particlePtrs.push_back(&p);
+		if (p->position(0) - EPS < -m_width/2) {
+			keep = false;
+			removePtrs.push_back(p);
 		}
 		// right x: 0 -> m_width/2
-		if (p.position(0) + EPS > m_width/2)
-		{
-			p.velocity(0) *= BOUND_DAMPING;
-			particlePtrs.push_back(&p);
+		if (p->position(0) + EPS > m_width/2) {
+			keep = false;
+			removePtrs.push_back(p);
 		}
 		// bottom y: -m_height/2 -> 0
-		if (p.position(1) - EPS < -m_height/2)
-		{
-			p.velocity(1) *= BOUND_DAMPING;
-			particlePtrs.push_back(&p);
+		if (p->position(1) - EPS < -m_height/2) {
+			p->velocity(0) *= BOUND_DAMPING;
+			p->velocity(1) = BOUND_DAMPING*std::abs(p->velocity(1));
 		}
 		// top y: 0 -> m_height/2
-		if (p.position(1) + EPS > m_height/2)
-		{
-			p.velocity(1) *= BOUND_DAMPING;
-			particlePtrs.push_back(&p);
+		if (p->position(1) + EPS > m_height/2) {
+			p->velocity(0) *= BOUND_DAMPING;
+			p->velocity(1) = -BOUND_DAMPING*std::abs(p->velocity(1));
 		}
-		//std::cout << p.position(0) << ", " << p.position(1) << '\n';
+		if (keep) {
+			keepPtrs.push_back(p);
+		}
 	}
-    MoveToInlet(particlePtrs);
+	m_pparticles = std::move(keepPtrs);
+	for (auto& p : removePtrs) {
+		p->position = {0,0,0};
+	}
+	m_emplacePtrP.insert(m_emplacePtrP.end(), removePtrs.begin(), removePtrs.end());
+    //MoveToInlet(particlePtrs);
 }
 
 
 std::vector<glm::vec3> Fluids::MakeParticlesDrawable() {
     std::vector<glm::vec3> out;
-    out.reserve(m_particles.size()*Particle::NUM_POINTS_PER_PARTICLE);
+    out.reserve(m_pparticles.size()*Particle::NUM_POINTS_PER_PARTICLE);
 
-    for (const auto& p : m_particles) {
-        float x = p.position(0);
-        float y = p.position(1);
+    for (const auto& p : m_pparticles) {
+        float x = p->position(0);
+        float y = p->position(1);
 
         float normalized_x = 2*x/m_width;
         float normalized_y = 2*y/m_height;
@@ -158,3 +161,4 @@ std::vector<glm::vec3> Fluids::MakeParticlesDrawable() {
     }
     return out;
 }
+

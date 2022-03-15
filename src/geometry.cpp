@@ -5,11 +5,11 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <numbers>
 
 Geometry::Geometry(const E57Handle* const _e57objp)
     : e57objp(_e57objp) {
 }
-
 
 std::vector<glm::vec3> Geometry::VectorFromEigen(const Eigen::MatrixXf& matrix) {
     std::vector<glm::vec3> out;
@@ -19,6 +19,11 @@ std::vector<glm::vec3> Geometry::VectorFromEigen(const Eigen::MatrixXf& matrix) 
     }
     return out;
 }
+
+Eigen::MatrixXf Geometry::EigenFromVector(const std::vector<glm::vec3>& vvec3) {
+    return {};
+}
+
 
 void Geometry::CollectRawData() {
     std::cerr << "in collect raw data"  << '\n';
@@ -148,6 +153,35 @@ void Geometry::CollectBoundaryPoints() {
         (container.data(), container.size()/3, 3);
 }
 
+std::vector<glm::vec3> Geometry::GetCirclePrimitive() {
+    float r = 100;
+    float rx = 2*r/m_width;
+    float ry = 2*r/m_height;
+    int n_partitions = 8;
+
+    std::vector<glm::vec3> out;
+    for (float i=0; i<=2*std::numbers::pi; i+= 2*std::numbers::pi/n_partitions) {
+        out.push_back(glm::vec3(r*std::cos(i), r*std::sin(i), 0));
+    }
+    m_primitiveCircle = out;
+    std::cout << " printing for m_primitiveCircle" << '\n';
+    for (const auto& glmv : m_primitiveCircle) {
+        std::cout << glmv[0] << ' ' << glmv[1] << ' ' << glmv[2] << '\n';
+    }
+    m_primitiveCircleScaled = out;
+    std::for_each(m_primitiveCircleScaled.begin(), m_primitiveCircleScaled.end(), [m_width, m_height, rx, ry]<typename T>(T& pt){
+        pt[0] *= 2/m_width;
+        pt[1] *= 2/m_height;
+    });
+
+    std::cout << " printing for m_primitiveCircleScaled" << '\n';
+    for (const auto& glmv : m_primitiveCircleScaled) {
+        std::cout << glmv[0] << ' ' << glmv[1] << ' ' << glmv[2] << '\n';
+    }
+
+    std::cout << " dont GetCirclePrimitive" << '\n';
+    return out;
+}
 
 const Eigen::MatrixXf& Geometry::GetNormalizedData() const {
     return m_normalizedData;

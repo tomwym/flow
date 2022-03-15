@@ -18,7 +18,7 @@ public:
 
 protected:
 private:
-    constexpr static float m_aspect = (float)m_width/(float)m_height;
+    constexpr static float m_aspect = m_width/m_height;
     glm::mat4 m_perspective;
     glm::vec3 m_position;
     glm::vec3 m_forward;

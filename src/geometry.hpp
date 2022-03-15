@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include "Eigen/Dense"
 
+#include "display.hpp"
 #include "e57handle.hpp"
 #include "algorithms.hpp"
 
@@ -11,7 +12,7 @@
  *
  */
 
-class Geometry {
+class Geometry : Display {
 public:
     Geometry(const E57Handle* const _e57objp);
 
@@ -28,7 +29,10 @@ public:
     void CollectClusteredData(const Eigen::MatrixXf& input);
     void CollectBoundaryPoints();
 
+    std::vector<glm::vec3> GetCirclePrimitive();
+
     static std::vector<glm::vec3> VectorFromEigen(const Eigen::MatrixXf& matrix);
+    static Eigen::MatrixXf EigenFromVector(const std::vector<glm::vec3>& vvec3);
     static Eigen::MatrixXf ReduceSize(const size_t size, const Eigen::MatrixXf& input);
     const Eigen::MatrixXf& GetNormalizedData() const;
     const Eigen::MatrixXf& GetPlanarData() const;
@@ -42,6 +46,9 @@ public:
         current_axis = _current_axis;
     }
     int current_axis = 0;
+
+    std::vector<glm::vec3> m_primitiveCircle;
+    std::vector<glm::vec3> m_primitiveCircleScaled;
 
 protected:
 private:

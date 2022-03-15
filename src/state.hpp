@@ -12,7 +12,7 @@
 #include "mesh.hpp"
 #include "transform.hpp"
 
-class State {
+class State : public Display {
 public:
     State(const std::string& name, const char thiskey)
         : m_name(name)

@@ -24,7 +24,6 @@ private:
     void operator=(const Window& Window);
     Window(const Window& Window);
 
-    static const int m_fps = 60;
     constexpr static float m_frameDelay = 1000/m_fps;
     GLuint m_frameStart = 0;
     int m_frameTime = 0;
