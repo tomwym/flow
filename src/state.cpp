@@ -209,23 +209,8 @@ void State1::Hello() {
     mesh->UpdateStatic(geom->m_primitiveCircleScaled);
     // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetBoundaryPoints()));
     mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
-
     mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
-    // initialize the flow object with the geometry of boundary nodes
-    // FlowObject<glm::vec3> fo(geom->m_primitiveCircle, 0.1);
-    // auto temp = Geometry::VectorFromEigen(geom->GetBoundaryPoints());
     std::vector<glm::vec3> temp = geom->m_primitiveCircle;
-    // std::cout << " temp 1 " << '\n';
-    // for (const auto& v : temp) {
-    //     std::cout << v[0] << ' ' << v[1] << '\n';
-    // }
-    // std::for_each(temp.begin(), temp.end(),
-    //               [m_width, m_height](glm::vec3& v){ v[0] *= m_width/2; v[1] *= m_height/2; });
-    // std::cout << " temp 2 " << '\n';
-    // for (const auto& v : temp) {
-    //     std::cout << v[0] << ' ' << v[1] << '\n';
-    // }
-    //auto temp = geom->m_primitiveCircle;
     FlowObject<glm::vec3> fo(temp, 0.1);
     Fluids fluidhandle(fo);
     fluidhandle.InitializeSPH();

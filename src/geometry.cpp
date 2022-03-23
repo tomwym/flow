@@ -32,15 +32,23 @@ void Geometry::CollectRawData() {
         (e57objp->HandleLinearData().data(), dimensions.first, 3);
 }
 
-// normalize such that max(x,y,z)=1, min(x,y,z)=-1
-// translate then scale
+/*
+ * Collect the raw data from the fileIO input, transform s.t. the min and max
+ * coordinate in all 3 axis is no larger than 1, min no smaller than -1
+ * Translate such that each basis axis is centered
+ * Scale down such that max basis dim = 2 (1 - (-1))
+ */
 void Geometry::CollectNormalizedData() {
     std::cerr << "in collect normalized data"  << '\n';
+    // set the buffer m_normalizedData as copy
     m_normalizedData = m_rawData;
+    // deltas represent the absolute difference in each basis {dx, dy, dz}
     std::vector<float> deltas {};
     deltas.reserve(m_normalizedData.cols());
 
+    // iterate over each column of m_normalizedData ({0,1,2} ~ {x,y,z})
     for (auto col : m_normalizedData.colwise()) {
+        // get min and max of each columns and find difference
         const float maxval = col.maxCoeff();
         const float minval = col.minCoeff();
         const float delta = maxval-minval;
@@ -50,7 +58,7 @@ void Geometry::CollectNormalizedData() {
     }
 
     const auto maxel = max_element(deltas.begin(), deltas.end());
-    const float arbitrary_window_scale = 0.5;
+    const float arbitrary_window_scale = 1;
     const float scale = arbitrary_window_scale*2/deltas.at(std::distance(deltas.begin(), maxel));
     m_normalizedData = (scale*m_normalizedData.array()).matrix();
 }
@@ -82,7 +90,11 @@ Eigen::Matrix3f Geometry::CollectRotationMatrix(const T& rotations) {
     return rotZ * rotY * rotX;
 }
 
-
+/*
+ * Apply current projection to get the data on a 2d slice
+ * Send the data to ReduceSize() to reduce the number of rows
+ * At this point we want the planar data to exist in the pixel context coords
+ */
 void Geometry::CollectPlanarData() {
     m_planarData = Eigen::MatrixXf(m_normalizedData.rows(), 3);
     Eigen::Matrix3f rotation = CollectRotationMatrix<Eigen::Vector3f>(m_rotation_vals);
@@ -127,10 +139,9 @@ Eigen::MatrixXf Geometry::ReduceSize(const size_t size, const Eigen::MatrixXf& i
     return out;
 }
 
-void Geometry::CollectClusteredData(const Eigen::MatrixXf& input) {
-    m_clusteredData = KMeans<void>(Geometry::ReduceSize(10000, input));
-}
-
+/*
+ * Runs the k nearest neighbors algorithm to determine the outline
+ */
 void Geometry::CollectBoundaryPoints() {
     // start off with matrix input
     std::ifstream ifs("./dat/bunnyBoundary.dat");

@@ -60,10 +60,10 @@ private:
     int m_itemcount = 0;
     Eigen::Vector3f m_view_normal = {0, 0, 1};
 
-    Eigen::MatrixXf m_rawData; //.[L]
-    Eigen::MatrixXf m_normalizedData; //.[L]
-    Eigen::MatrixXf m_planarData; //.[L]
-    Eigen::MatrixXf m_reducedPlanarData;
-    Eigen::MatrixXf m_clusteredData;
-    Eigen::MatrixXf m_boundaryPoints;
+    Eigen::MatrixXf m_rawData; //.[L] {arbitrary}
+    Eigen::MatrixXf m_normalizedData; //.[L] {m_width, m_height, 1}
+    Eigen::MatrixXf m_planarData; //.[L] {m_width, m_height, 1}
+    Eigen::MatrixXf m_reducedPlanarData; //.[l] {m_width, m_height, 1}
+    // note: m_boundaryPoints is list of boundary pts w initial pt REPEATED
+    Eigen::MatrixXf m_boundaryPoints; //.[s] {m_width, m_height, 1}
 };
