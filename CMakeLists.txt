@@ -12,9 +12,10 @@ endif()
 set(CMAKE_CXX_COMPILER "g++-11")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 # pch
 # target_precompile_headers(FLOW PUBLIC Dense)
@@ -51,6 +52,8 @@ find_library(E57_LIB
     NAMES E57RefImpl
     HINTS ${E57_DIR}/lib)
 
+# pthreads
+find_package(Threads REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -75,4 +78,5 @@ target_link_libraries(flow
     ${SDL2_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARIES}
+    Threads::Threads
 )

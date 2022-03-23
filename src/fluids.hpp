@@ -21,7 +21,11 @@ public:
     void InitializeSPH();
     void ComputeRhoP();
     void ComputeForces();
-    void Integrate();
+    void Integrate(const int iteration);
+
+    const std::vector<Particle*>& getNearfieldPtrP() const {
+        return m_nearfieldPtrP;
+    }
 
     // container containing all particles
     std::vector<Particle> m_particles;
@@ -29,6 +33,8 @@ public:
     std::vector<Particle*> m_pparticles;
     // buffer of emptied particles
     std::vector<Particle*> m_emplacePtrP;
+    // store the nearfield particles for integration
+    std::vector<Particle*> m_nearfieldPtrP;
 
     std::vector<glm::vec3> MakeParticlesDrawable();
     FlowObject<glm::vec3> m_flowObj;

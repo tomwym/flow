@@ -51,47 +51,16 @@ int main(int argc, char** argv) {
     Geometry geom(&e57obj);
     geom.CollectRawData();
     geom.CollectNormalizedData();
-    /*
-    Eigen::Vector3f T(0,0,-0.1);
-    float r0 = 0.5*M_PI;
-    float r1 = 0;
-    float r2 = 0.5*M_PI;
 
-    Eigen::Matrix3f R0 ({{1, 0, 0},
-                         {0, cos(r0), -sin(r0)},
-                         {0, sin(r0), cos(r0)}});
-    Eigen::Matrix3f R1 ({{cos(r1), 0, sin(r1)},
-                         {0, 1, 0},
-                         {-sin(r1), 0, cos(r1)}});
-    Eigen::Matrix3f R2 ({{cos(r2), -sin(r2), 0},
-                         {sin(r2), cos(r2), 0},
-                         {0, 0, 1}});
-    Eigen::Matrix3f R = 2 * R1 * R1;
-
-    Eigen::Matrix4f RT = Eigen::Matrix4f::Identity();
-    RT.block<3,3>(0,0) = R;
-    RT.block<3,1>(0,3) = T;
-    std::cout << RT << '\n';
-    A = A * RT.transpose();
-    A = A.block(0, 0, A.rows(), 3);
-    // transpose and
-
-    Eigen::MatrixXf B = A.transpose() * A;
-    Eigen::JacobiSVD<Eigen::MatrixXf> svdobj(B, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    Eigen::MatrixXf C = 5 * A * svdobj.matrixU()(Eigen::all, {1,2});
-    std::cout << C.rows() << ' ' << C.cols() << '\n';
-    */
     std::vector<glm::vec3> temp(convertPoints<void>(geom.GetNormalizedData()));
 
     Window wind("flow");
     Mesh mesh(temp, fdsa);
     Shader shader("./res/basicShader");
     Transform transform;
-    Camera camera(glm::vec3(0,0,-0.2), 70.0f, 0.01f, 1000.0f);
+    Camera camera(glm::vec3(0,0,-0.2), 70.f, 0.01f, 1000.f);
     float counter = 0.f;
-    // State st("state0", '0');
-    // State* here = &st;
-
+    
     State3 st3("state3", '3');
     State2 st2("state2", '2', &st3);
     State1 st1("state1", '1', &st2);
@@ -110,7 +79,7 @@ int main(int argc, char** argv) {
     mesh.SetDrawDynamicPrimitive(GL_TRIANGLES);
 
 	while(!wind.IsClosed()) {
-		wind.ClearScreen(0.0f, 0.2f, 0.4f, 1.0f);
+		wind.ClearScreen("light blue");
         // transform.GetPos().x = sinf(counter);
         // transform.GetRot().z = counter;
         shader.Bind();
@@ -118,7 +87,7 @@ int main(int argc, char** argv) {
         // transform.UpdateRotation<Eigen::Vector3f>(geom.m_rotation_vals);
         shader.Update(transform, camera);
         here = here->Spin(wind);
-        mesh.UpdateDynamic(fdsa);
+        // mesh.UpdateDynamic(fdsa);
         mesh.Draw();
         wind.Update();
 

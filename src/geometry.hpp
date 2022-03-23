@@ -30,6 +30,7 @@ public:
     void CollectBoundaryPoints();
 
     std::vector<glm::vec3> GetCirclePrimitive();
+    std::vector<glm::vec3> TestShapePrimitive();
 
     static std::vector<glm::vec3> VectorFromEigen(const Eigen::MatrixXf& matrix);
     static Eigen::MatrixXf EigenFromVector(const std::vector<glm::vec3>& vvec3);
@@ -47,6 +48,8 @@ public:
     }
     int current_axis = 0;
 
+    std::vector<glm::vec3> m_testShape;
+    std::vector<glm::vec3> m_testShapeScaled;
     std::vector<glm::vec3> m_primitiveCircle;
     std::vector<glm::vec3> m_primitiveCircleScaled;
 

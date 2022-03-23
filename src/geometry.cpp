@@ -153,6 +153,8 @@ void Geometry::CollectBoundaryPoints() {
         (container.data(), container.size()/3, 3);
 }
 
+// returns the circle, in pixel coordinates
+// sets m_primitiveCircle and m_primitiveCircleScaled
 std::vector<glm::vec3> Geometry::GetCirclePrimitive() {
     float r = 100;
     float rx = 2*r/m_width;
@@ -164,23 +166,27 @@ std::vector<glm::vec3> Geometry::GetCirclePrimitive() {
         out.push_back(glm::vec3(r*std::cos(i), r*std::sin(i), 0));
     }
     m_primitiveCircle = out;
-    std::cout << " printing for m_primitiveCircle" << '\n';
-    for (const auto& glmv : m_primitiveCircle) {
-        std::cout << glmv[0] << ' ' << glmv[1] << ' ' << glmv[2] << '\n';
-    }
     m_primitiveCircleScaled = out;
-    std::for_each(m_primitiveCircleScaled.begin(), m_primitiveCircleScaled.end(), [m_width, m_height, rx, ry]<typename T>(T& pt){
+    std::for_each(m_primitiveCircleScaled.begin(), m_primitiveCircleScaled.end(), [m_width, m_height]<typename T>(T& pt){
         pt[0] *= 2/m_width;
         pt[1] *= 2/m_height;
     });
 
-    std::cout << " printing for m_primitiveCircleScaled" << '\n';
-    for (const auto& glmv : m_primitiveCircleScaled) {
-        std::cout << glmv[0] << ' ' << glmv[1] << ' ' << glmv[2] << '\n';
-    }
-
-    std::cout << " dont GetCirclePrimitive" << '\n';
     return out;
+}
+
+// returns the circle, in pixel coordinates
+// sets m_primitiveCircle and m_primitiveCircleScaled
+std::vector<glm::vec3> Geometry::TestShapePrimitive() {
+    m_testShapeScaled;
+    std::for_each(m_testShapeScaled.begin(),
+                  m_testShapeScaled.end(),
+                  [m_width, m_height]<typename T>(T& pt){
+        pt[0] *= 2/m_width;
+        pt[1] *= 2/m_height;
+    });
+
+    return {};
 }
 
 const Eigen::MatrixXf& Geometry::GetNormalizedData() const {

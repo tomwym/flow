@@ -17,7 +17,7 @@ public:
     float rho;   // density
     float p;     // pressure
 
-    static const int NUM_POINTS_PER_PARTICLE = 8; // -> +1 on peterimeter
+    static const int NUM_POINTS_PER_PARTICLE = 6; // -> +1 on peterimeter
 protected:
 private:
 

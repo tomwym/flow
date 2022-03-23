@@ -82,12 +82,13 @@ void Fluids::ComputeForces(void)
 }
 
 
-void Fluids::Integrate()
+void Fluids::Integrate(const int iteration)
 {
 	const auto temp = *m_pparticles[0];
 	//std::cout << temp.position(1) << ' ' << temp.position(1) << ' ' <<  temp.position(2) << '\n';
-	std::vector<Particle*> keepPtrs{};
-	std::vector<Particle*> removePtrs{};
+	std::vector<Particle*> keepPtrs;
+	std::vector<Particle*> removePtrs;
+	std::vector<Particle*> nearfieldPtrs;
 	for (auto& p : m_pparticles) {
 		bool keep = true;
 		// forward Euler integration
@@ -98,10 +99,11 @@ void Fluids::Integrate()
 		// object interaction
 		if (p->position(0) < 0.25*m_height && p->position(0) > -0.25*m_height &&
 			p->position(1) < 0.25*m_height && p->position(1) > -0.25*m_height) {
+			nearfieldPtrs.push_back(p);
 			bool pnp = m_flowObj.ParticleInObject(*p);
 			if (pnp) {
 				//std::cout << "position: " << p->position(0) << ' ' << p->position(1) << '\n';
-				auto dir = m_flowObj.FindClosestSeeegment({p->position(0), p->position(1),0});
+				auto dir = m_flowObj.FindClosestSegment({p->position(0), p->position(1),0});
 				//std::cout << "dir: " << dir[0] << ' ' << dir[1] << '\n';
 				p->position(0) += dir[0];
 				p->position(1) += dir[1];
@@ -136,6 +138,7 @@ void Fluids::Integrate()
 		p->position = {0,0,0};
 	}
 	m_emplacePtrP.insert(m_emplacePtrP.end(), removePtrs.begin(), removePtrs.end());
+	m_nearfieldPtrP = std::move(nearfieldPtrs);
     //MoveToInlet(particlePtrs);
 }
 

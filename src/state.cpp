@@ -3,6 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <numeric>
+#include <future>
 #include "fluids.hpp"
 #include "functions.hpp"
 
@@ -150,7 +151,6 @@ void State0::ReducePoints() {
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetClusteredData()));
     mesh->SetDrawStaticPrimitive(GL_POINTS);
-
 }
 
 // u
@@ -207,26 +207,51 @@ void State1::Hello() {
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     geom->GetCirclePrimitive();
     mesh->UpdateStatic(geom->m_primitiveCircleScaled);
+    // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetBoundaryPoints()));
     mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
 
     mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
     // initialize the flow object with the geometry of boundary nodes
-    FlowObject<glm::vec3> fo(geom->m_primitiveCircle);
+    // FlowObject<glm::vec3> fo(geom->m_primitiveCircle, 0.1);
+    // auto temp = Geometry::VectorFromEigen(geom->GetBoundaryPoints());
+    std::vector<glm::vec3> temp = geom->m_primitiveCircle;
+    // std::cout << " temp 1 " << '\n';
+    // for (const auto& v : temp) {
+    //     std::cout << v[0] << ' ' << v[1] << '\n';
+    // }
+    // std::for_each(temp.begin(), temp.end(),
+    //               [m_width, m_height](glm::vec3& v){ v[0] *= m_width/2; v[1] *= m_height/2; });
+    // std::cout << " temp 2 " << '\n';
+    // for (const auto& v : temp) {
+    //     std::cout << v[0] << ' ' << v[1] << '\n';
+    // }
+    //auto temp = geom->m_primitiveCircle;
+    FlowObject<glm::vec3> fo(temp, 0.1);
     Fluids fluidhandle(fo);
     fluidhandle.InitializeSPH();
 
-    const int seconds = 2;
+    const int seconds = 3;
     const int iterations = m_fps*seconds;
 
     for (int i=0; i<iterations; ++i) {
+        auto calcforce = [i](){return (i % 60 == 0 && i > 0);};
+        std::future<glm::vec3> calcf;
+        if (calcforce()) {
+            calcf = std::async(std::launch::async, &FlowObject<glm::vec3>::GetBodyForce, fo, fluidhandle.getNearfieldPtrP());
+        }
         fluidhandle.ComputeRhoP();
         fluidhandle.ComputeForces();
-        fluidhandle.Integrate();
+        fluidhandle.Integrate(i);
         std::vector<glm::vec3> fdsa = fluidhandle.MakeParticlesDrawable();
-		wind->ClearScreen(0.0f, 0.2f, 0.4f, 1.0f);
+		wind->ClearScreen("light blue");
         mesh->UpdateDynamic(fdsa);
         mesh->DrawNArrays(fdsa.size(), Particle::NUM_POINTS_PER_PARTICLE+2);
         wind->Update();
         wind->LimitFrames();
+        if (calcforce()) {
+            const glm::vec3 body_force = calcf.get();
+            std::cout << "body force: " << body_force[0] << ' ' << body_force[1] << '\n';
+        }
     }
+    mesh->UpdateDynamic({});
 }

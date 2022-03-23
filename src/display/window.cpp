@@ -1,6 +1,26 @@
 #include "window.hpp"
 
 #include <iostream>
+#include <array>
+
+// printing function for associated colors
+template <typename T, size_t val>
+std::ostream& operator<<(std::ostream &ostr, const std::array<T, val>& arr) {
+    for (const auto& v : arr) {
+        ostr << v << ' ';
+    }
+    ostr << '\n';
+    return ostr;
+}
+
+
+const std::map<std::string, std::array<float, 4>> Window::m_colormap = {
+    {"red", {1.f, 0.f, 0.f, 1.f}},
+    {"green", {0.f, 1.f, 0.f, 1.f}},
+    {"blue", {0.f, 0.f, 1.f, 1.f}},
+    {"light blue", {173.f/255.f, 216.f/255.f, 230.f/255.f, 1.f}},
+    {"black", {0.f, 0.f, 0.f, 1.f}}
+};
 
 Window::Window(const std::string& title) {
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -40,9 +60,16 @@ Window::~Window() {
     SDL_Quit();
 }
 
-void Window::ClearScreen(const float r, const float g, const float b, const float a) {
+void Window::ClearScreen(const int r, const int g, const int b, const float a) {
     m_frameStart = SDL_GetTicks();
-    glClearColor(r, g, b, a);
+    glClearColor(r/255.f, g/255.f, b/255.f, a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Window::ClearScreen(const std::string& color_name) {
+    const std::array<float, 4>& ca = Window::m_colormap.at(color_name);
+    m_frameStart = SDL_GetTicks();
+    glClearColor(ca[0], ca[2], ca[3], ca[4]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
