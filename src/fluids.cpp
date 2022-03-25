@@ -97,14 +97,12 @@ void Fluids::Integrate(const int iteration)
 
 		// enforce boundary conditions
 		// object interaction
-		if (p->position(0) < 0.25*m_height && p->position(0) > -0.25*m_height &&
-			p->position(1) < 0.25*m_height && p->position(1) > -0.25*m_height) {
+		if (p->position(0) < 1*m_height && p->position(0) > -1*m_height &&
+			p->position(1) < 1*m_height && p->position(1) > -1*m_height) {
 			nearfieldPtrs.push_back(p);
 			bool pnp = m_flowObj.ParticleInObject(*p);
 			if (pnp) {
-				//std::cout << "position: " << p->position(0) << ' ' << p->position(1) << '\n';
 				auto dir = m_flowObj.FindClosestSegment({p->position(0), p->position(1),0});
-				//std::cout << "dir: " << dir[0] << ' ' << dir[1] << '\n';
 				p->position(0) += dir[0];
 				p->position(1) += dir[1];
 			}
@@ -142,7 +140,10 @@ void Fluids::Integrate(const int iteration)
     //MoveToInlet(particlePtrs);
 }
 
-
+/*
+ * Given a vector of particles in Pixel coordinates, return the full vector of
+ * OpenGL vertices
+ */
 std::vector<glm::vec3> Fluids::MakeParticlesDrawable() {
     std::vector<glm::vec3> out;
     out.reserve(m_pparticles.size()*Particle::NUM_POINTS_PER_PARTICLE);
@@ -151,15 +152,14 @@ std::vector<glm::vec3> Fluids::MakeParticlesDrawable() {
         float x = p->position(0);
         float y = p->position(1);
 
-        float normalized_x = 2*x/m_width;
-        float normalized_y = 2*y/m_height;
-        float rx = 2*H/m_width;
-        float ry = 2*H/m_height;
+        float normalized_x = x/m_height;
+        float normalized_y = y/m_height;
+		float r = H/m_height;
 
         out.push_back({normalized_x,normalized_y,0});
 
         for (float i=0; i<=2*std::numbers::pi; i+= 2*std::numbers::pi/Particle::NUM_POINTS_PER_PARTICLE) {
-            out.push_back({rx*std::cos(i) + normalized_x, ry*std::sin(i) + normalized_y, 0});
+            out.push_back({r*std::cos(i) + normalized_x, r*std::sin(i) + normalized_y, 0});
         }
     }
     return out;

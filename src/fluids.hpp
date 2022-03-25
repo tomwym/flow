@@ -41,7 +41,7 @@ public:
 protected:
 private:
     // interaction
-    const int MAX_PARTICLES = 1000;
+    const int MAX_PARTICLES = 100;
 
     // "Particle-Based Fluid Simulation for Interactive Applications"
     // solver parameters

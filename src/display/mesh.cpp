@@ -11,6 +11,7 @@ Mesh::Mesh(const std::vector<glm::vec3>& vertices1,
     glGenVertexArrays(NUM_VAO, m_vao);
     glGenBuffers(NUM_VBO, m_vbo);
 
+    glViewport(0, 0, (GLsizei)m_width, (GLsizei)m_height);
     // static mesh
     UpdateStatic({});
     // dynamic mesh

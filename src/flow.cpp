@@ -21,46 +21,34 @@
 int main(int argc, char** argv) {
     std::cout << "hello flow!" << std::endl;
 
-    std::vector<glm::vec3> asdf({glm::vec3(-0.05,  0.05, 0),
-                                 glm::vec3(-0.05, -0.05, 0),
-                                 glm::vec3( 0.05,  0.05, 0),
-                                 glm::vec3( 0.05, -0.05, 0)});
     float theta = 0;
     std::vector<glm::vec3> fdsa(makeTriangle<void>(Display::m_width, Display::m_height, theta, 200));
 
     E57Handle e57obj;
     if (argc > 1) {
-        std::cout << argc << ' ' << argv[1] << '\n';
-        e57obj.SetFileName(argv[1]);
+        if (argv[1] == "-f" && argc > 2) {
+            e57obj.SetFileName(argv[2]);
+        }
     }
     e57obj.SetAll();
-    //e57obj.PrintData();
-
     std::vector<std::vector<float>> data(e57obj.MoveData());
-    Eigen::MatrixXf A(data[0].size(), 4);
-    std::cout << A.rows() << ' ' << A.cols() << '\n';
-    for (size_t i = 0; i < data[0].size(); i++) {
-        for (size_t j = 0; j < 3; j++) {
-            A(i,j) = data[j][i];
-        }
-        A(i,3) = 1;
-    }
-    A = (5*A.array()).matrix();
-
 
     Geometry geom(&e57obj);
     geom.CollectRawData();
+    if (argc > 1) {
+        geom.CollectObjData(argv[2]);
+    }
     geom.CollectNormalizedData();
 
-    std::vector<glm::vec3> temp(convertPoints<void>(geom.GetNormalizedData()));
+    std::vector<glm::vec3> temp(convertPoints<void>(geom.GetNormalizedPxData()));
 
     Window wind("flow");
     Mesh mesh(temp, fdsa);
     Shader shader("./res/basicShader");
     Transform transform;
-    Camera camera(glm::vec3(0,0,-0.2), 70.f, 0.01f, 1000.f);
+    Camera camera(glm::vec3(0,0,8), 0.15f, 0.01f, 100.f);
     float counter = 0.f;
-    
+
     State3 st3("state3", '3');
     State2 st2("state2", '2', &st3);
     State1 st1("state1", '1', &st2);

@@ -121,8 +121,8 @@ void State0::StateSpecific(const SDL_Keycode k) {
 // p
 void State0::Show3D() {
     transform->UpdateRotation<Eigen::Vector3f>(geom->m_rotation_vals);
-    std::cout << geom->m_rotation_vals.transpose() << '\n';
-    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetNormalizedData()));
+    // std::cout << geom->m_rotation_vals.transpose() << '\n';
+    mesh->UpdateStatic(geom->GetNormalizedGlData());
     mesh->SetDrawStaticPrimitive(GL_POINTS);
 }
 
@@ -131,33 +131,15 @@ void State0::Show2D() {
     geom->CollectPlanarData();
     transform->UpdateRotation<std::vector<float>>({0,0,0});
     std::cout << geom->m_rotation_vals.transpose() << '\n';
-    // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetPlanarData()));
-    mesh->UpdateStatic(Geometry::VectorFromEigen(Geometry::ReduceSize(5000, geom->GetPlanarData())));
-    mesh->SetDrawStaticPrimitive(GL_POINTS);
-
-    /*
-    const Eigen::MatrixXf obj = Geometry::ReduceSize(5000, geom->GetPlanarData());
-    std::ofstream o("temp.dat");
-    for (const auto& row : obj.rowwise()) {
-        o << row << '\n';
-    }
-    o.close();
-    */
-}
-
-// i // DOES NOT WORK PROPERLY
-void State0::ReducePoints() {
-    geom->CollectClusteredData(geom->GetReducedPlanarData());
-    transform->UpdateRotation<std::vector<float>>({0,0,0});
-    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetClusteredData()));
+    mesh->UpdateStatic(geom->GetReducedPlanarGlData());
     mesh->SetDrawStaticPrimitive(GL_POINTS);
 }
 
 // u
 void State0::SearchForBoundary() {
-    geom->CollectBoundaryPoints();
+    geom->CollectBoundaryPoints(16);
     transform->UpdateRotation<std::vector<float>>({0,0,0});
-    mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetBoundaryPoints()));
+    mesh->UpdateStatic(geom->GetBoundaryPointGlData());
     mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
 }
 
@@ -205,12 +187,14 @@ void State1::StateSpecific(const SDL_Keycode k) {
 // l
 void State1::Hello() {
     transform->UpdateRotation<std::vector<float>>({0,0,0});
-    geom->GetCirclePrimitive();
-    mesh->UpdateStatic(geom->m_primitiveCircleScaled);
-    // mesh->UpdateStatic(Geometry::VectorFromEigen(geom->GetBoundaryPoints()));
+    geom->GetCirclePrimitive(3);
+    // mesh->UpdateStatic(geom->m_primitiveCircleScaled);
+    mesh->UpdateStatic(geom->GetBoundaryPointGlData());
     mesh->SetDrawStaticPrimitive(GL_LINE_STRIP);
     mesh->SetDrawDynamicPrimitive(GL_TRIANGLE_FAN);
-    std::vector<glm::vec3> temp = geom->m_primitiveCircle;
+
+    // std::vector<glm::vec3> temp = geom->m_primitiveCircle;
+    std::vector<glm::vec3> temp = geom->GetBoundaryPointPxData();
     FlowObject<glm::vec3> fo(temp, 0.1);
     Fluids fluidhandle(fo);
     fluidhandle.InitializeSPH();
